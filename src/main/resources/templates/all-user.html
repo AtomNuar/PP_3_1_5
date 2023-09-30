@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin</title>
+    <style>table th, table td {padding: 5px;}</style>
+</head>
+
+<body>
+<h1>All Users</h1>
+
+<table th:border="1" th:cellpadding="5">
+
+    <tr>
+        <th>Name</th>
+        <th>Last Name</th>
+        <th>Age</th>
+        <th>Password</th>
+        <th>Role</th>
+        <th>Operations</th>
+    </tr>
+
+    <tr th:each="usr : ${allUsr}">
+
+        <td th:utext="${usr.name}">name</td>
+        <td th:utext="${usr.lastname}">lastname</td>
+        <td th:utext="${usr.age}">age</td>
+        <td th:utext="${usr.password}">password</td>
+        <td th:utext="${usr.roles}">role</td>
+
+
+        <td>
+            <form th:action="@{/updateInfo}" method="get">
+                <input type="hidden" name="usrId" th:value="${usr.id}">
+                <button type="submit">Update</button>
+                <br><br>
+            </form>
+            <form th:action="@{/deleteUser}" method="get">
+                <input type="hidden" name="usrId" th:value="${usr.id}">
+                <button type="submit">Delete</button>
+            </form>
+
+        </td>
+
+    </tr>
+
+</table>
+
+<br>
+
+<label>
+    <input th:type="button" value="Add"
+           onclick="window.location.href='addNewUsers'"/>
+</label>
+<br>
+<br>
+<form th:action="@{/logout}" method="get">
+    <input type="submit" value="logout"/>
+</form>
+
+
+</body>
+
+</html>
