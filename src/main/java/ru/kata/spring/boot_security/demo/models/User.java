@@ -1,48 +1,43 @@
 package ru.kata.spring.boot_security.demo.models;
 
-import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Entity
-@Table( name =  "users")
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "id")
-    private  Long id;
+    private Long id;
 
-    @Column (name = "name")
     private String name;
 
-    @Column (name = "lastname")
     private String lastname;
 
-    @Column (name = "age")
     private Byte age;
 
 
     @Column(name = "password")
     private String userPassword;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "users_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles;
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "users_id"))
+    private Set<Role> roles;
 
     public User() {
 
     }
-    public User(Long id, String name, String lastname, Byte age, String userPassword, List<Role> roles) {
+
+    public User(Long id, String name, String lastname, Byte age, String userPassword, Set<Role> roles) {
         this.id = id;
         this.name = name;
         this.lastname = lastname;
@@ -83,16 +78,16 @@ public class User implements UserDetails {
         this.age = age;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
     public String getUserPassword() {
-        return userPassword;
+        return this.userPassword;
     }
 
     public void setUserPassword(String userPassword) {
@@ -104,13 +99,14 @@ public class User implements UserDetails {
         return getRoles();
     }
 
+    @Override
     public String getPassword() {
-        return getUserPassword();
+        return this.userPassword;
     }
 
     @Override
     public String getUsername() {
-        return getName();
+        return this.name;
     }
 
     @Override
@@ -132,7 +128,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 
     @Override

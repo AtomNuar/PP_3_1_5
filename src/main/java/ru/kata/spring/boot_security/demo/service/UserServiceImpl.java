@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,11 +13,12 @@ import java.util.List;
 
 @Service
 @EnableTransactionManagement(proxyTargetClass = true)
-public class UserServiceImpl  implements UserService {
+public class UserServiceImpl implements UserService {
 
 
     private final UserDao userDao;
 
+    @Autowired
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
     }
@@ -46,7 +48,7 @@ public class UserServiceImpl  implements UserService {
 
     @Override
     @Transactional
-    public void updateUser( User user) {
+    public void updateUser(User user) {
         userDao.updateUser(user);
     }
 
@@ -60,10 +62,10 @@ public class UserServiceImpl  implements UserService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDao.getNameUser(username);
-        if (user == null){
-            throw new UsernameNotFoundException(String.format("User %s not found",username));
+        if (user == null) {
+            throw new UsernameNotFoundException(String.format("User %s not found", username));
         }
-        return new  org.springframework.security.core.userdetails.User( user.getUsername(),user.getPassword(),
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getUserPassword(),
                 user.isAccountNonExpired(), user.isCredentialsNonExpired(),
                 user.isEnabled(), user.isAccountNonLocked(),
                 user.getRoles());

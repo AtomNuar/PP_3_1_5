@@ -1,7 +1,6 @@
 package ru.kata.spring.boot_security.demo.models;
 
 
-
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -14,19 +13,16 @@ public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+
     private Long id;
-    @Column(name = "role")
     private String role;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "users_id"))
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<User> users;
 
     public Role(String role) {
         this.role = role;
+
     }
 
     public Role() {
