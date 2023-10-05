@@ -1,22 +1,62 @@
 package ru.kata.spring.boot_security.demo.service;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
-import ru.kata.spring.boot_security.demo.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.model.Role;
+import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.List;
 
-public interface UserService extends UserDetailsService {
 
-    List<User> getUserList();
+@Service
+@Transactional
+public class UserService {
 
-    void saveUser(User user);
+    @Autowired
+    private UserRepository userRepository;
 
-    User getNameUser(String username);
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 
-    User getUser(Long id);
+    public User getUserById(long id) {
+        return userRepository.getById(id);
+    }
 
-    void updateUser(User user);
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
-    void deleteUser(Long id);
+    public void save(User user) {
+        userRepository.save(user);
+    }
 
+    public void update(Long id, User user) {
+        User userToUpdate = userRepository.getById(id);
+        userToUpdate.setFirstName(user.getFirstName());
+        userToUpdate.setLastName(user.getLastName());
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setAge(user.getAge());
+        userToUpdate.setRoles(user.getRoles());
+        userRepository.save(userToUpdate);
+    }
+
+    public void delete(long id) {
+        userRepository.deleteById(id);
+    }
+
+    public void setInitData() {
+        Role userRole = new Role("ROLE_USER");
+        Role adminRole = new Role("ROLE_ADMIN");
+        userRepository.save(new User("user", "user", (byte) 30, "user@mail.ru", "user", new HashSet<Role>() {{
+            add(userRole);
+        }}));
+        userRepository.save(new User("admin", "admin", (byte) 35, "admin@mail.ru", "admin", new HashSet<Role>() {{
+            add(userRole);
+            add(adminRole);
+        }}));
+    }
 }

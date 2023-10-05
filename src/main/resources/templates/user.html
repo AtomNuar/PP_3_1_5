@@ -1,25 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User</title>
+    <meta charset="UTF-8">
+    <title>User page</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
 </head>
 <body>
-<h1>Welcome to your site! </h1>
-<table th:border="1" th:cellpadding="5">
-    <tr>
-        <th>Name</th>
-        <th>Last Name</th>
-        <th>Age</th>
-    </tr>
-    <tr th:each="usr : ${user}">
-        <td th:utext="${usr.name}">name</td>
-        <td th:utext="${usr.lastname}">lastname</td>
-        <td th:utext="${usr.age}">age</td>
-    </tr>
-</table>
-<br>
-<form th:action="@{/logout}" method="get">
-    <input type="submit" value="Logout"/>
-</form>
+<header th:replace="fragments/header :: header"/>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col bg-white px-0">
+            <div class="nav flex-column nav-pills " id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <button class="nav-link active text-start" id="v-pills-user-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-user"
+                        type="button" role="tab" aria-controls="v-pills-user" aria-selected="true">User
+                </button>
+            </div>
+        </div>
+        <div class="col-10 vh-100 bg-light">
+            <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="v-pills-user" role="tabpanel"
+                     aria-labelledby="v-pills-user-tab">
+                    <div th:replace="fragments/userInfo :: userInfo"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
