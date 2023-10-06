@@ -12,8 +12,12 @@ import java.util.List;
 @Transactional
 public class RoleService {
 
+    private final RoleRepository roleRepository;
+
     @Autowired
-    private RoleRepository roleRepository;
+    public RoleService(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
 
     public Role getRoleById(long id) {
         return roleRepository.getById(id);

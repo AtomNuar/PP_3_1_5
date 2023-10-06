@@ -37,7 +37,7 @@ public class User implements UserDetails {
     private String password;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User(String firstName, String lastName, byte age, String email, String password,
                 Set<Role> roles) {

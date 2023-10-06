@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
     private RoleRepository roleRepository;
@@ -30,7 +30,8 @@ public class UserServiceImpl implements UserService{
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public  UserServiceImpl() {}
+    public UserServiceImpl() {
+    }
 
 
     @Override
@@ -56,13 +57,13 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void update(Long id, User user) {
-            User userToUpdate = userRepository.getById(id);
-            userToUpdate.setFirstName(user.getFirstName());
-            userToUpdate.setLastName(user.getLastName());
-            userToUpdate.setEmail(user.getEmail());
-            userToUpdate.setAge(user.getAge());
-            userToUpdate.setRoles(user.getRoles());
-            userRepository.save(userToUpdate);
+        User userToUpdate = userRepository.getById(id);
+        userToUpdate.setFirstName(user.getFirstName());
+        userToUpdate.setLastName(user.getLastName());
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setAge(user.getAge());
+        userToUpdate.setRoles(user.getRoles());
+        userRepository.save(userToUpdate);
     }
 
     @Override

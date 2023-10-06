@@ -14,9 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final UserDetailsService userDetailsService; // сервис, с помощью которого тащим пользователя
-    private final SuccessUserHandler successUserHandler; // класс, в котором описана логика перенаправления пользователей по ролям
+    private final UserDetailsService userDetailsService;
+    private final SuccessUserHandler successUserHandler;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
     public SecurityConfig(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
                           SuccessUserHandler successUserHandler, PasswordEncoder passwordEncoder) {
@@ -28,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     protected void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
-                 .passwordEncoder(bCryptPasswordEncoder); // конфигурация для прохождения аутентификации
+                .passwordEncoder(bCryptPasswordEncoder); // конфигурация для прохождения аутентификации
     }
 
     @Override
@@ -60,10 +61,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/login?logout")
                 .and()
                 .csrf().disable();
-        ;
     }
-
-    // Необходимо для шифрования паролей
-    // В данном примере не используется, отключен
 
 }
