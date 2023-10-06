@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +14,15 @@ import java.security.Principal;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+    private UserService userService;
+    private RoleService roleService;
 
     @Autowired
-    UserService userService;
+    public AdminController(RoleService roleService,UserService userService) {
+        this.roleService = roleService;
+        this.userService = userService;
+    }
 
-    @Autowired
-    RoleService roleService;
 
     @GetMapping(value = "")
     public String getAdminPage(Model model, Principal principal) {
@@ -40,12 +44,12 @@ public class AdminController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
+    public String deleteUser(@PathVariable("id") Long id) {
         userService.delete(id);
         return "redirect:/admin";
     }
 
-    @PostMapping("/updateUser/{id}")
+    @RequestMapping("/updateUser/{id}")
     public String updateUser(@ModelAttribute("emptyUser") User user, @PathVariable("id") Long id,
                              @RequestParam(value = "userRolesSelector") String[] selectResult) throws Exception {
         for (String s : selectResult) {
