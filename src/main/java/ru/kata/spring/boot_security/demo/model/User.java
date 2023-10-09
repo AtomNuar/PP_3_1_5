@@ -5,81 +5,62 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+@Entity
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Entity
 @Table(name = "users")
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "first_name")
     private String firstName;
-
     @Column(name = "last_name")
     private String lastName;
-
-    private byte age;
 
     private String email;
 
     private String password;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    private Set<Role> roles = new HashSet<>();
-
-    public User(String firstName, String lastName, byte age, String email, String password,
-                Set<Role> roles) {
+    public User(String firstName, String lastName, String email, String password, Set<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.age = age;
         this.email = email;
         this.password = password;
         this.roles = roles;
     }
 
-    public String getRolesAsString() {
-        boolean first = true;
-        StringBuilder s = new StringBuilder();
-        for (Role role : getRoles()) {
-            if (!first) {
-                s.append(", ");
-            }
-            s.append(role.toString());
-            first = false;
-        }
-        return s.toString();
-    }
 
-    public void addRole(Role role) {
-        roles.add(role);
-    }
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "user_id")
+    private Set<Role> roles;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roles.toString());
+        return List.of(authority);
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return email;
     }
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
 
     @Override
     public boolean isAccountNonExpired() {

@@ -1,33 +1,33 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.security.Principal;
 
-@Controller
+@RestController
+@Secured({"ROLE_USER", "ROLE_ADMIN"})
+@RequestMapping("/api/users")
 public class UserController {
-
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-
-    @RequestMapping(value = {("/login"), ("/index"), ("/")})
-    public String login(Model model) {
-        return "/login";
-    }
-
-    @GetMapping(value = "/user")
-    public String getUserPage(Model model, Principal principal) {
-        model.addAttribute("user", userService.getUserByEmail(principal.getName()));
-        return "/user";
+    @GetMapping("/user")
+    public ResponseEntity<User> getAuth(Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+        return user != null
+                ? new ResponseEntity<>(user, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

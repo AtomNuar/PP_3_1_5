@@ -1,60 +1,77 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.security.Principal;
+import java.util.List;
 
-@Controller
-@RequestMapping("/admin")
+@RestController
+@Secured("ROLE_ADMIN")
+@RequestMapping("/api/admin")
 public class AdminController {
-    private UserService userService;
-    private RoleService roleService;
+
+    private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
-    public AdminController(RoleService roleService,UserService userService) {
-        this.roleService = roleService;
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
 
-    @GetMapping(value = "")
-    public String getAdminPage(Model model, Principal principal) {
-        model.addAttribute("user", userService.getUserByEmail(principal.getName()));
-        model.addAttribute("users", userService.getAllUsers());
-        model.addAttribute("roles", roleService.getAllRoles());
-        model.addAttribute("emptyUser", new User());
-        return "/admin";
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> users = userService.findAll().stream().toList();
+        return !users.isEmpty()
+                ? new ResponseEntity<>(users, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/addUser")
-    public String createUser(@ModelAttribute("emptyUser") User user,
-                             @RequestParam(value = "checkedRoles") String[] selectResult) {
-        for (String s : selectResult) {
-            user.addRole(roleService.getRoleByName("ROLE_" + s));
-        }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getRoles() {
+        List<Role> roles = roleService.getRoles().stream().toList();
+        return !roles.isEmpty()
+                ? new ResponseEntity<>(roles, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<User> addUser(@RequestBody User user) {
         userService.save(user);
-        return "redirect:/admin";
+        User Newuser = userService.findByEmail(user.getEmail());
+        return Newuser != null
+                ? new ResponseEntity<>(Newuser, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        User user = userService.findById(id);
+        return user != null
+                ? new ResponseEntity<>(user, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateUser(@RequestBody User user) {
+        userService.save(user);
+    }
+
+
+    @DeleteMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable("id") Long id) {
         userService.delete(id);
-        return "redirect:/admin";
-    }
-
-    @RequestMapping("/updateUser/{id}")
-    public String updateUser(@ModelAttribute("emptyUser") User user, @PathVariable("id") Long id,
-                             @RequestParam(value = "userRolesSelector") String[] selectResult) throws Exception {
-        for (String s : selectResult) {
-            user.addRole(roleService.getRoleByName("ROLE_" + s));
-        }
-        userService.update(id, user);
-        return "redirect:/admin";
     }
 }
+
